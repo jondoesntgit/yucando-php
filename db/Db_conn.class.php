@@ -60,5 +60,13 @@ class Db_conn {
     $stmt->execute();   
   }
   
+  public function get_punches($task_id) {
+    $stmt = $this->db->prepare('SELECT * FROM timepunches where `task_id` = :task_id');
+    $stmt->bindParam(':task_id', $task_id);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $results;
+  }
+  
 }
 ?>
