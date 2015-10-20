@@ -1,4 +1,4 @@
 <?php
 include_once('header.php');
-echo "Hello World";
+echo "You are viewing the live deployment";
 ?>
