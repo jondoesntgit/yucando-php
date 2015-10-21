@@ -50,14 +50,16 @@ class Db_conn {
     $stmt->bindParam(':task_id', $task_id);
     $stmt->bindParam(':punch_in', $punch_in);
     $stmt->execute();    
+    return $this->db->lastInsertId();
   }
   
   public function insert_stop_punch($task_id) {
     $punch_out = date("Y-m-d G:i:s");
-    $stmt = $this->db->prepare("UPDATE timepunches SET `punch_out` = :punch_out WHERE `task_id` = :task_id");
+    $stmt = $this->db->prepare("UPDATE timepunches SET `punch_out` = :punch_out WHERE `task_id` = :task_id AND `punch_out` IS NULL");
     $stmt->bindParam(':task_id', $task_id);
     $stmt->bindParam(':punch_out', $punch_out);
     $stmt->execute();   
+    return $stmt->rowCount();
   }
   
   public function get_punches($task_id) {
@@ -66,6 +68,15 @@ class Db_conn {
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $results;
+  }
+  
+  public function complete_task($task_id) {
+    $completed_at = date("Y-m-d G:i:s");
+    $stmt = $this->db->prepare('UPDATE tasks SET `completed_at` = :completed_at WHERE `id` = :task_id');
+    $stmt->bindParam(':completed_at', $completed_at);
+    $stmt->bindParam(':task_id', $task_id);
+    $stmt->execute();
+    return $stmt->rowCount();
   }
   
 }

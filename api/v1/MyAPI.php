@@ -41,8 +41,8 @@ class MyAPI extends API
      
      protected function punch_in() {
        if ($this->method == 'POST') {
-         $this->conn->insert_start_punch(3);
-         return Array();
+         $task_id = isset($this->args[0]) ? $this->args[0] : 0; // TODO Sanitization
+         return $this->conn->insert_start_punch($task_id);
        } else {
          return Array();
        }
@@ -50,8 +50,8 @@ class MyAPI extends API
      
      protected function punch_out() {
        if ($this->method == 'POST') {
-         $this->conn->insert_stop_punch(3);
-         return Array();
+         $task_id = isset($this->args[0]) ? $this->args[0] : 0; // TODO Sanitization
+         return $this->conn->insert_stop_punch($task_id);
        } else {
          return Array();
        }
@@ -66,6 +66,23 @@ class MyAPI extends API
        } elseif ($this->method == 'GET') {
          $results = $this->conn->get_tasks();
          return $results;
+       } else {
+         return Array();
+       }
+     }
+     
+     protected function punch() {
+       if ($this->method == 'GET') {
+           return $this->conn->get_punches(3);
+       } else {
+           return array();
+       }
+     }
+     
+     protected function complete_task() {
+       if ($this->method == 'POST') {
+         $task_id = isset($this->args[0]) ? $this->args[0] : 0; // TODO Sanitization
+         return $this->conn->complete_task($task_id);
        } else {
          return Array();
        }
