@@ -1,25 +1,33 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="jquery.min.js"></script>
   <script>
+  
+  function reloadTable() {
+    $.get('ui/getTable.php',function(data){
+          $(" #table ").html(data)
+          console.log("Hello")
+    })}
+    
     function punch_in(task_id) {
       postUrl = 'api/v1/punch_in/' + task_id;
       $.post(postUrl, {'apiKey' : 123 }, function(data){
       });
-      location.reload();
+      reloadTable()
     }
       
     function punch_out(task_id) {
       postUrl = 'api/v1/punch_out/' + task_id;
       $.post(postUrl, {'apiKey' : 123 }, function(data){
       });
-      location.reload();
+      reloadTable()
     }
     
     function complete(task_id) {
       postUrl = 'api/v1/complete_task/' + task_id;
       $.post(postUrl, {'apiKey' : 123 }, function(data){
       });
-      location.reload();
+      reloadTable()
     }
     
     function create_task(title) {
@@ -27,13 +35,19 @@
       $.post(postUrl, {'apiKey' : 123, 'title' : title}, function(data){
         console.log(data);
       });
-      location.reload();
+      reloadTable()
     }
     
   $(document).ready(function(){
     $("#addTask").submit(function( event ) {
       create_task($("#title").val())
-      location.reload();
+      reloadTable()
+    });
+  })
+  
+  $(document).ready(function(){
+    $("#refresher").submit(function( event ) {
+      reloadTable()
     });
   })
   
@@ -42,8 +56,10 @@
 </head>
 
 <?php
+
 include_once('header.php');
 require_once('db/Db_conn.class.php');
+require_once('ui/functions.php');
 ?>
 
 <form id="addTask" action="#">
@@ -51,39 +67,12 @@ require_once('db/Db_conn.class.php');
   <input type="submit" value="Add Task" />
 </form>
 
+<form id="refresher" action="#">
+  <input type="submit" value="Refresh" />
+</form>
+
+<div id=table>
 <?php
-function listPunches($punches,$task_id) {
-  //if (empty($punches)) return "punch in here" ;
-  $returnString = '';
-  foreach ($punches as $punch) {
-    if (empty($punch['punch_in'])) {
-      $returnString .= "<a href=# onclick = \"punch_in({$task_id})\">Punch in</a>";
-      break;
-    }
-    $secondString = empty($punch['punch_out']) ? " -- <a href='#' onclick = \"punch_out({$task_id}) \">Punch out</a><br/>" : " -- " . $punch['punch_out'] . "<br/>";
-    $returnString .= $punch['punch_in'] . $secondString;
-  }
-        $returnString .= "<a href=# onclick = \"punch_in({$task_id})\">Punch in</a>";
-  return $returnString;
-}
-
-
-$conn = new Db_conn();
-
-$tasks = $conn->get_tasks();
-echo "<table border=1>\n";
-echo "<tr><th>Name</th><th>Punches</th><th>Complete</th></tr>\n";
-foreach ($tasks as $task) {
-    if (empty($task['completed_at'])) {
-    $punches = $conn->get_punches($task['id']);
-    echo "<tr>
-      <td>" . $task['title'] . "</td>
-      <td>" . listPunches($punches, $task['id']) . "</td>
-      <td><a href='#' onclick = \"complete({$task['id']})\">Complete</a></td>
-    </tr>\n"; 
-  }
-}
-
-
-echo "</table>";
+  echo makePunchTable();
 ?>
+</div>
