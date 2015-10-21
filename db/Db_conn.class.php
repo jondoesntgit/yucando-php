@@ -79,5 +79,13 @@ class Db_conn {
     return $stmt->rowCount();
   }
   
+  public function get_user_by_apiKey($apiKey) {
+    $stmt = $this->db->prepare('SELECT * FROM users where `api_key` = :apiKey');
+    $stmt->bindParam(':apiKey', $apiKey);
+    $stmt->execute();
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $results;
+  }
+  
 }
 ?>

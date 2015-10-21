@@ -12,7 +12,7 @@ class MyAPI extends API
 
         // Abstracted out for example
         $APIKey = new Models\APIKey();
-        $User = new Models\User();
+        $User = new Models\User($this->request['apiKey']);
 	
         if (!array_key_exists('apiKey', $this->request)) {
             throw new Exception('No API Key provided');
@@ -37,6 +37,14 @@ class MyAPI extends API
         } else {
             return "Only accepts GET requests";
         }
+     }
+     
+     protected function user() {
+       if ($this->method == 'GET') {
+         return $this->conn->get_users();
+       } else {
+         return Array();
+       }
      }
      
      protected function punch_in() {
