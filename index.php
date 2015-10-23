@@ -1,12 +1,10 @@
 <head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="jquery.min.js"></script>
   <script>
   
   function reloadTable() {
     $.get('ui/getTable.php',function(data){
           $(" #table ").html(data)
-          console.log("Hello")
     })}
     
     function punch_in(task_id) {
@@ -60,6 +58,29 @@
 include_once('header.php');
 require_once('db/Db_conn.class.php');
 require_once('ui/functions.php');
+require_once('ui/login.php');
+
+if (isset($_POST['username']) && isset($_POST['password'])) {
+  $db = new Db_conn();
+  $user_id = $db->attempt_login($_POST['username'], $_POST['password']);
+  if($user_id) {
+    echo "User id = " . $user_id;
+    $_SESSION['user_id'] = $user_id; 
+  } else {
+    echo "Invalid login credentials";
+  }
+}
+
+if (isset($_SESSION['user_id'])) {
+  if (!isset($db)) {
+    $db = new Db_conn();
+  }
+  $user_array = $db->get_user_by_id($_SESSION['user_id']);
+  echo "Welcome " . $user_array['first_name'] ." ". $user_array['last_name'];
+} else {
+  echo getLoginForm();
+}
+
 ?>
 
 <form id="addTask" action="#">

@@ -3,8 +3,9 @@
 class Db_conn {
   
   private $db;
+  private $user_id;
   
-  public function __construct() {
+  public function __construct($user_id = null) {
     // Get database configuration from configuration file.
     $config = parse_ini_file("config.ini");
     $username = $config['mysql_user'];
@@ -18,6 +19,8 @@ class Db_conn {
         $username, 
         $password
       );
+    
+    $this->user_id = $user_id;
   }
 
   public function insert_user($username) {
@@ -85,6 +88,27 @@ class Db_conn {
     $stmt->execute();
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
     return $results;
+  }
+  
+  public function get_user_by_id($id) {
+    $stmt = $this->db->prepare('SELECT * FROM users where `id` = :id LIMIT 1');
+    $stmt->bindParam(':id', $id);
+    $stmt->execute();
+    $results = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $results;
+  }
+  
+  public function attempt_login($username,$password) {
+    $username = 'wheelerj';
+    $password = 'abc123';
+    $id = 1;
+      $stmt = $this->db->prepare('select * from users where `username` = :username and `password` = :password ');
+      $stmt->bindParam(':username',$username);
+      $stmt->bindParam(':password',$password);
+      $stmt->execute();
+      $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+      $id =  (isset($results[0]['id'])) ? $results[0]['id'] : false;
+      return $id;
   }
   
 }
